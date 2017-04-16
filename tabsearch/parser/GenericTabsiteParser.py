@@ -156,6 +156,9 @@ class GenericTabsiteParser(object):
 		if html == '':
 			print('Error: html is empty string')
 			return
+		if html == b'':
+			print('Error: html is empty bytes-string')
+			return
 
 		text = ""
 		searchTree = fromstring(html)
