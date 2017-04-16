@@ -88,7 +88,7 @@ class GenericTabsiteParser(object):
 			self.callback_info(
 					'\t-> No overview page found on '+self.website_title+' ('+self.website_short+')!\n'
 					'\t   Maybe this is a bug in this plugin. Please have a look on the overview page\n' +
-					'\t   and report at http://code.google.com/p/tab-rhythmbox-plugin/ if the tabs\n' +
+					'\t   and report at https://github.com/Kitzberger/rhythmbox-tabsearch/issues if the tabs\n' +
 					'\t   for this song are linked to on this page:\n\t   ' + url)
 			return
 
@@ -114,7 +114,7 @@ class GenericTabsiteParser(object):
 					'\t-> Nothing found on '+self.website_title+' ('+self.website_short+')!\n'
 					'\t   Not one single link for this song found on artists overview page!\n' +
 					'\t   Maybe this is a bug in this plugin. Please have a look on the overview page\n' +
-					'\t   and report at http://code.google.com/p/tab-rhythmbox-plugin/ if the tabs\n' +
+					'\t   and report at https://github.com/Kitzberger/rhythmbox-tabsearch/issues if the tabs\n' +
 					'\t   for this song are linked to on this page:\n\t   ' + url)
 		else:
 			self.callback_info('')
@@ -167,7 +167,7 @@ class GenericTabsiteParser(object):
 		if len(preTags) == 0:
 			info =	'no pre tag found this tab site!\n\n'
 			info +=	'maybe this is a bug in this plugin. please have a look on the page\n'
-			info +=	'and report at http://code.google.com/p/tab-rhythmbox-plugin/ if this site\n'
+			info +=	'and report at https://github.com/Kitzberger/rhythmbox-tabsearch/issues if this site\n'
 			info +=	'does contain for this song:\n' + params['url']
 			self.callback_info(info)
 		elif len(preTags) > 0:
