@@ -24,9 +24,9 @@
 
 from Tab import Tab
 from lxml.html import fromstring
-from GenericTabsiteParser import GenericTabsiteParser
+from parser.GenericTabsiteParser import GenericTabsiteParser
 from Helper import remove_accents
-from gi._glib import GError
+from gi.repository.GLib import GError
 from gi.repository import Gio
 
 class AZChordsParser (GenericTabsiteParser):
@@ -50,14 +50,14 @@ class AZChordsParser (GenericTabsiteParser):
 		""" initiates web lookup for given artist and title """
 		self.artist = artist
 		self.title = title
-		
-		print 'Checking ' + self.website_title + '...'
-		
+
+		print('Checking ' + self.website_title + '...')
+
 		artist_url = None
-		
+
 		artist = self.prepare_artist_for_url()
 		first_letter = artist[0]
-		
+
 		# url for overview page that lists all artists with that first letter
 		url = "http://www.azchords.com/"+first_letter+".html"
 
@@ -69,41 +69,41 @@ class AZChordsParser (GenericTabsiteParser):
 		try:
 			result = self.file_res.load_contents_finish(result)
 		except GError:
-			print "Error: can't open uri: " + params['url']
+			print("Error: can't open uri: " + params['url'])
 			return
 		successful = result[0]
 		html = result[1]
 
 		if html is None:
-			print 'Error: html is None'
+			print('Error: html is None')
 			self.callback_info(
 				'\t-> No index page found on '+self.website_title+' ('+self.website_short+')!\n'
-				'\t   Maybe this is a bug in this plugin. Please have a look on the overview page\n' + 
-				'\t   and report at http://code.google.com/p/tab-rhythmbox-plugin/ if the artist\n' + 
+				'\t   Maybe this is a bug in this plugin. Please have a look on the overview page\n' +
+				'\t   and report at http://code.google.com/p/tab-rhythmbox-plugin/ if the artist\n' +
 				'\t   of this song is listed on this page:\n\t   ' + params['url'])
 			return
-		
+
 		searchTree = fromstring(html)
-		
+
 		# get the url for artists overview page
 		expr = ".//*/a[contains(., \""+params['artist'].title()+"\") ]"
-		print "\t-> using expression: " + expr
+		print("\t-> using expression: " + expr)
 		tree = searchTree.xpath(expr)
-		
+
 		if len(tree) > 0:
 			overview_url = "http://www.azchords.com/"+tree[0].get('href')
 			self.process_url_to_overview_page(overview_url)
 		else:
-			print 'Error: no overview page'
+			print('Error: no overview page')
 			self.callback_info(
 					'\t-> No overview page found on '+self.website_title+' ('+self.website_short+')!\n'
-					'\t   Maybe this is a bug in this plugin. Please have a look on the index page\n' + 
-					'\t   and report at http://code.google.com/p/tab-rhythmbox-plugin/ if the artist\n' + 
+					'\t   Maybe this is a bug in this plugin. Please have a look on the index page\n' +
+					'\t   and report at http://code.google.com/p/tab-rhythmbox-plugin/ if the artist\n' +
 					'\t   of this song is linked to on this page:\n\t   ' + params['url'])
 
 	def fetch_tabs(self, tree):
 		first_letter = self.prepare_artist_for_url()[0]
-		
+
 		tabs = []
 		for a in tree:
 #			link = "http://www.azchords.com/"+first_letter+"/"+a.get('href')

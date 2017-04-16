@@ -1,5 +1,5 @@
 [Plugin]
-Loader=python
+Loader=python3
 Module=tabsearch
 IAge=2
 Depends=rb
@@ -7,5 +7,5 @@ Name=Tab Search Plugin
 Description=Search guitar tabs using web. (Version 0.5 for Gtk3)
 Description[de]=Gitarren-Tabs aus dem Web laden. (Version 0.5 für Gtk3)
 Authors=Giulio Massaccesi <giulio.massaccesi@gmail.com>;Philipp Kitzberger <philipp@kitze.net>
-Copyright=Copyright © 2010-2012 Giulio Massaccesi
-Website=http://code.google.com/p/tab-rhythmbox-plugin/
+Copyright=Copyright © 2010-2016 Massaccesi & Kitzberger
+Website=https://github.com/Kitzberger/rhythmbox-tabsearch

@@ -27,7 +27,7 @@ from Tab import Tab
 import re
 from lxml import etree
 from gi.repository import Gio
-from gi._glib import GError
+from gi.repository.GLib import GError
 
 class GenericTabsiteParser(object):
 	website_title = ''
@@ -37,7 +37,7 @@ class GenericTabsiteParser(object):
 	tab_list = []
 	callback_content = None
 	callback_info = None
-	
+
 	def __init__(self, website_title, website_short, callback_content, callback_info):
 		self.website_title = website_title
 		self.website_short = website_short
@@ -48,71 +48,73 @@ class GenericTabsiteParser(object):
 		""" initiates web lookup for given artist and title """
 		self.artist = artist
 		self.title = title
-		
-		print 'Checking ' + self.website_title + '...'
-		
+
+		print('Checking ' + self.website_title + '...')
+
 		url = self.generate_url_to_overview()
 		# continue with processing of the url in other function,
-		# so this classes subclass (concrete: AZChordsParser) can jump 
+		# so this classes subclass (concrete: AZChordsParser) can jump
 		# between this and the other function
 		self.process_url_to_overview_page(url)
-		
+
 	def process_url_to_overview_page(self, url):
 		""" does a lookup to overview page and calls the function to
 			process it asynchronously """
 		if url is None:
-			print "-> No tabs found for '" + self.artist + "' on " + self.website_title + ' (' + self.website_short + ')'
+			print("-> No tabs found for '" + self.artist + "' on " + self.website_title + ' (' + self.website_short + ')')
 			return
-		
-		print "-> overview: " + url
-		
+
+		print("-> overview: " + url)
+
 		# fetch overview page with artist's titles
 		self.file_res = Gio.File.new_for_uri(url)
 		self.file_res.load_contents_async(None, self.process_overview_page, url)
-		print 'waiting for results ...'
+		print('waiting for results ...')
 
 	def preprocess_overview_page(self, html):
-		return unicode(html, encoding='iso_8859_1')
+		return html
+		#return unicode(html, encoding='iso_8859_1')
 
 	def preprocess_single_page(self, html):
-		return unicode(html, encoding='iso_8859_1')
+		return html
+		#return unicode(html, encoding='iso_8859_1')
 
 	def process_overview_page(self, gdaemonfile, result, url):
-		""" Processes html of artists overview page, scans it for 
+		""" Processes html of artists overview page, scans it for
 			links to title pages and initiates fetching of those pages """
-		
+
 		if result is None:
-			print 'Error: no overview page'
+			print('Error: no overview page')
 			self.callback_info(
 					'\t-> No overview page found on '+self.website_title+' ('+self.website_short+')!\n'
-					'\t   Maybe this is a bug in this plugin. Please have a look on the overview page\n' + 
-					'\t   and report at http://code.google.com/p/tab-rhythmbox-plugin/ if the tabs\n' + 
+					'\t   Maybe this is a bug in this plugin. Please have a look on the overview page\n' +
+					'\t   and report at http://code.google.com/p/tab-rhythmbox-plugin/ if the tabs\n' +
 					'\t   for this song are linked to on this page:\n\t   ' + url)
 			return
 
 		try:
 			result = self.file_res.load_contents_finish(result)
 		except GError:
-			print "Error: can't read from url:\n\t" + url
+			print("Error: can't read from url:\n\t" + url)
 			return
 		successful = result[0]
 		html = result[1]
-		
-		print 'Overview page found'
+
+		print('Overview page found')
 		html = self.preprocess_overview_page(html)
 		searchTree = fromstring(html)
-		
+
 		expr = self.get_title_expr()
-		print "using expression: " + expr
-		
+		print("using expression: " + expr)
+
 		tree = searchTree.xpath(expr)
-		print "found " + str(len(tree)) + " tabs for '" + self.title + "'"
+		print("found " + str(len(tree)) + " tabs for '" + self.title + "'")
 		if len(tree) == 0:
 			self.callback_info(
 					'\t-> Nothing found on '+self.website_title+' ('+self.website_short+')!\n'
 					'\t   Not one single link for this song found on artists overview page!\n' +
-					'\t   Maybe this is a bug in this plugin. Please have a look on the overview page\n' + 
-					'\t   and report at http://code.google.com/p/tab-rhythmbox-plugin/ if the tabs\n' + 
+					'\t   Maybe this is a bug in this plugin. Please have a look on the overview page\n' +
+					'\t   and report at http://code.google.com/p/tab-rhythmbox-plugin/ if the tabs\n' +
 					'\t   for this song are linked to on this page:\n\t   ' + url)
 		else:
 			self.callback_info('')
@@ -128,8 +130,8 @@ class GenericTabsiteParser(object):
 
 	def fetch_single_tab(self, url, type, title):
 		""" Fetches page from given url and fetches tabs """
-		print "-> " + url
-		
+		print("-> " + url)
+
 		tab = "nothing"
 		if url != "":
 			self.file_res = Gio.File.new_for_uri(url)
@@ -141,21 +143,21 @@ class GenericTabsiteParser(object):
 		try:
 			result = self.file_res.load_contents_finish(result)
 		except GError:
-			print "Error: can't read from url:\n\t" + params['url']
+			print("Error: can't read from url:\n\t" + params['url'])
 			return
 		successful = result[0]
 		html = result[1]
 
 		html = self.preprocess_single_page(html)
-		
+
 		if html is None:
-			print 'Error: html is None'
+			print('Error: html is None')
 			return
 		if html == '':
-			print 'Error: html is empty string'
+			print('Error: html is empty string')
 			return
-	
-		text = ""	
+
+		text = ""
 		searchTree = fromstring(html)
 		expr = self.get_tab_expr()
 		preTags = searchTree.xpath(expr)
@@ -166,22 +168,23 @@ class GenericTabsiteParser(object):
 			info +=	'does contain for this song:\n' + params['url']
 			self.callback_info(info)
 		elif len(preTags) > 0:
-			pre = etree.Element('pre')
 			# philipp changed the second parameter from "encoding=unicode"
 			# to "utf-8" since the internal processing of tabs works exclusivly
 			# with this encoding.
 			# have a look at the function process_tab()
-			for i in range(0, len(preTags)):
-				text += etree.tostring(preTags[i], encoding='utf-8')
+			for preTag in preTags:
+				content = etree.tostring(preTag, encoding='utf-8')
+				text += str(content, 'utf-8')
 
 			text = self.process_tab(text)
+
 			if len(preTags) > 1:
-				text = "More than one <pre> found.\n\n" + text + "\n\n" + html
+				text = "More than one <pre> found.\n\n" + text + "\n\n" + str(html, 'utf-8')
 		# return loaded tabs to notebook:
 		self.callback_content(text, {'source': 'web ('+self.website_short+')', 'type': params['type'], 'artist': self.artist, 'title': self.title, 'title_on_website': params['title']})
 
 	def get_tab_expr(self):
-		""" Return a XPath expression that matches the one element 
+		""" Return a XPath expression that matches the one element
 			within a HTML document that contains the guitar tabs """
 		return ".//*/pre"
 
@@ -198,10 +201,10 @@ class GenericTabsiteParser(object):
 		return ".//*/a[contains(., \""+title+"\")]"
 
 	def prepare_artist_for_url(self):
-		return self.artist.decode('utf-8')
-		
+		return self.artist
+
 	def prepare_title_for_url(self):
-		return self.title.decode('utf-8')
+		return self.title
 
 	# cleans the incoming tabs
 	def process_tab(self, tab):
@@ -230,11 +233,11 @@ class GenericTabsiteParser(object):
 
 	def cleanTitle(self):
 		title = self.title
-		
+
 		# cut off ".mp3" or ".mP3"
 		title = re.sub("\.[Mm][Pp]3$","",title)
-		
+
 		# cut off "01 -"
 		title = re.sub(".*[-]","",title)
-		#print "\t-> cleanTitle(): '" + self.title + "' -> '" + title + "'"
+		#print("\t-> cleanTitle(): '" + self.title + "' -> '" + title + "'")
 		return title

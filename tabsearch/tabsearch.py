@@ -22,12 +22,14 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA.
 
+import gi
+gi.require_version('WebKit', '3.0')
 
 import os
 from gi.repository import GObject, Gtk, Gdk, Pango, Gio, Peas, PeasGtk
 from gi.repository import RB
 from gi.repository import WebKit
-from gi._glib import GError
+from gi.repository.GLib import GError
 import re
 import rb
 from parser.GuitareTabParser import GuitareTabParser
@@ -88,7 +90,7 @@ class TabSearch(GObject.Object):
 		self.visible = True
 
 		self.init_gui()
-		self.connect_signals()		
+		self.connect_signals()
 
 		self.action_toggle = ('ToggleTabSearch', self.stock, _('TabSearch'),
 		 		None, _('Change the visibility of the tab search pane'),
@@ -96,7 +98,7 @@ class TabSearch(GObject.Object):
 
 		self.action_group = Gtk.ActionGroup('TabSearchActions')
 		self.action_group.add_toggle_actions([self.action_toggle])
-		
+
 		# since the visibility toggle is per default set to TRUE,
 		# click it once, if visibility in gconf is set to false!
 		if self.settings.get_boolean('visible') == False:
@@ -110,9 +112,9 @@ class TabSearch(GObject.Object):
 
 
 	def init_gui(self) :
-		print "TabSearch->init_gui"
+		print("TabSearch->init_gui")
 		self.vbox = Gtk.VBox()
-		
+
 		self.toolbar = Gtk.Toolbar()
 		self.toolitemSave = Gtk.ToolButton()
 		self.toolitemSave.set_label('Save')
@@ -139,7 +141,7 @@ class TabSearch(GObject.Object):
 
 		self.progressbar = Gtk.ProgressBar()
 		self.timeout = GObject.timeout_add(100, self.start_pulse)
-		
+
 		self.vbox.set_size_request(250, -1)
 		self.shell.add_widget(self.vbox, RB.ShellUILocation.RIGHT_SIDEBAR, expand=True, fill=True)
 		self.vbox.show_all()
@@ -151,10 +153,10 @@ class TabSearch(GObject.Object):
 		self.vbox.pack_end(self.progressbar, expand = False, fill = True, padding = 0)
 		self.timeout = GObject.timeout_add(100, self.start_pulse)
 		self.start_pulse()
-		
+
 	def hide_pulse(self):
 		self.nr_sites = self.nr_sites-1
-		print "Sites left to stop progressbar: "+str(self.nr_sites)
+		print("Sites left to stop progressbar: "+str(self.nr_sites))
 		if self.nr_sites == 0:
 			self.vbox.remove(self.progressbar)
 			GObject.source_remove(self.timeout)
@@ -167,7 +169,7 @@ class TabSearch(GObject.Object):
 		icon_file_path = rb.find_plugin_file(self.plugin, filename)
 		#icon_file_path = os.path.join(plugin.plugin_info.get_data_dir(), filename)
 		if icon_file_path is None:
-			print filename +" not found in "+self.plugin.plugin_info.get_data_dir()
+			print(filename +" not found in "+self.plugin.plugin_info.get_data_dir())
 			return Gtk.STOCK_INFO
 		else:
 			iconsource = Gtk.IconSource()
@@ -190,11 +192,11 @@ class TabSearch(GObject.Object):
 			if sites is None:
 				sites = []
 		except:
-			print "Error: can't load the sites from configuration"
+			print("Error: can't load the sites from configuration")
 			sites = []
-		print "tabs sites: " + str(sites)
+		print("tabs sites: " + str(sites))
 		return sites
-		
+
 	# which folder did the user specify in the configuration dialog?
 	# TODO: what's happening when the path is not valid?
 	def get_tabfolder(self):
@@ -202,25 +204,25 @@ class TabSearch(GObject.Object):
 #			folder = gconf.client_get_default().get_string(self.gconf_keys['folder'])
 			folder = self.settings.get_string('folder')
 		except:
-			print "Error: can't load the tab folder path from configuration"
-		print "tabs folder: " + folder
+			print("Error: can't load the tab folder path from configuration")
+		print("tabs folder: " + folder)
 		return folder
 
 	def load_tabs_from_web(self, action):
 		return self.load_tabs('web')
 
-	# callback function that is triggered whenever there's 
+	# callback function that is triggered whenever there's
 	# a change in played song title
 	def playing_changed_cb (self, playing, user_data):
-		print "There's been a change in playback ..."		
+		print("There's been a change in playback ...")
 		self.info_tab.set_content('Infos\n=====')
 		return self.load_tabs('hdd')
 
 	def load_tabs(self, source):
 		if self.visible is False:
-			print "no visibility -> no need to look for tabs"
+			print("no visibility -> no need to look for tabs")
 			return
-		
+
 		playing_entry = None
 		if self.sp:
 			playing_entry = self.sp.get_playing_entry()
@@ -231,9 +233,9 @@ class TabSearch(GObject.Object):
 #		playing_title = self.db.entry_get (playing_entry, rhythmdb.PROP_TITLE)
 		playing_artist = playing_entry.get_string(RB.RhythmDBPropType.ARTIST)
 		playing_title = playing_entry.get_string(RB.RhythmDBPropType.TITLE)
-		
-		print "looking for '" + playing_artist + "' and the song '" + playing_title + "'"
-		
+
+		print("looking for '" + playing_artist + "' and the song '" + playing_title + "'")
+
 		# passing the song info to the tab site parser
 		# without removing the é and è from it.
 		playing_artist = remove_accents(playing_artist)
@@ -241,7 +243,7 @@ class TabSearch(GObject.Object):
 
 		if playing_artist.upper() == "UNKNOWN":
 			playing_artist = ""
-			
+
 		# resetting notebook
 		if self.notebook in self.vbox.get_children():
 			self.vbox.remove(self.notebook)
@@ -253,12 +255,12 @@ class TabSearch(GObject.Object):
 
 		self.vbox.pack_start(self.notebook, expand = True, fill = True, padding=0)
 		self.vbox.show_all()
-		
+
 		# Remove tabs from notebook
 		self.tab_list = []
 		self.info_tab.set_meta('artist', playing_artist)
 		self.info_tab.set_meta('title', playing_title)
-		
+
 		if source == 'hdd':
 			self.update_info_tab("\nchecking hdd for '" + playing_artist + "' and the song '" + playing_title + "'")
 			self.hide_pulse()
@@ -267,7 +269,7 @@ class TabSearch(GObject.Object):
 			self.update_info_tab("\nchecking web for '" + playing_artist + "' and the song '" + playing_title + "'")
 			if not(playing_artist == ""):
 				# reset the number of sites in order to detect when the research finished
-				self.nr_sites = len(self.sites)		
+				self.nr_sites = len(self.sites)
 				self.show_pulse()
 
 				self.sites = self.get_sites()
@@ -295,7 +297,7 @@ class TabSearch(GObject.Object):
 						lc.tabs_finder(playing_artist, playing_title)
 
 	def deactivate (self, shell):
-		print "Plugin deactivated."
+		print("Plugin deactivated.")
 		self.shell = None
 		self.sp = None
 		self.db = None
@@ -307,7 +309,7 @@ class TabSearch(GObject.Object):
 
 	# toggles the visibility of the tab widget
 	def toggle_visibility(self, action):
-		print "Visibility set to " + str(not self.visible)
+		print("Visibility set to " + str(not self.visible))
 		if not self.visible:
 			self.shell.add_widget(self.vbox, RB.ShellUILocation.RIGHT_SIDEBAR, expand=True, fill=True)
 			self.visible = True
@@ -338,7 +340,7 @@ class TabSearch(GObject.Object):
 	def get_current_tab(self):
 		currentTab = self.notebook.get_current_page()
 		return self.notebook.get_nth_page(currentTab).get_child()
-		
+
 	# returns the currently selected tab content
 	def get_current_tab_title(self):
 		currentTab = self.notebook.get_current_page()
@@ -347,46 +349,46 @@ class TabSearch(GObject.Object):
 
 	# copies currently selected tabs to the hard disk
 	def save_tabs(self, action):
-		print 'saving tabs to hdd ...'
+		print('saving tabs to hdd ...')
 		self.toolitemSave.set_sensitive(False)
 		self.toolitemEdit.set_sensitive(True)
 		self.get_current_tab().set_editable(False)
-		
+
 		textbuffer = ""
 		try:
 			textbuffer = self.get_current_tab().get_buffer()
 			textbuffer = textbuffer.get_text(textbuffer.get_start_iter() , textbuffer.get_end_iter(), 0)
 		except:
-			print 'Error: can\'t read current\'s tabs content'
-		
+			print('Error: can\'t read current\'s tabs content')
+
 		if textbuffer is None:
-			print 'Error: loading current tabs failed'
+			print('Error: loading current tabs failed')
 			return
-		
+
 		directory = self.get_tabfolder() + '/' + self.info_tab.meta['artist'] + '/'
-		
+
 		try:
 			os.makedirs(directory)
 		except os.error:
-			print 'Notice: directory\'s already existing'
-		
+			print('Notice: directory\'s already existing')
+
 		filename = directory + self.info_tab.meta['title'] + '.txt'
-		
+
 		try:
 			file = open(filename, 'w')
 		except:
-			print "Error: can't open file"
+			print("Error: can't open file")
 			return
-		
+
 		file.write(textbuffer)
 		file.close()
-		print "-> saved successfully to hdd"
+		print("-> saved successfully to hdd")
 		self.load_tabs('hdd')
 
 
 	def open_tabs_from_hdd(self, artist, title):
 		filename = self.get_tabfolder() + '/' + artist + '/' + title + '.txt'
-		print filename
+		print(filename)
 		self.file_res = Gio.File.new_for_path(filename)
 		self.file_res.load_contents_async(None, self.open_tabs_from_hdd_cb, {'source': 'hdd', 'artist': artist, 'title': title})
 
@@ -394,17 +396,17 @@ class TabSearch(GObject.Object):
 		try:
 			result = self.file_res.load_contents_finish(result)
 		except GError:
-			print "Error: can't open file, maybe it's not there at all..."
+			print("Error: can't open file, maybe it's not there at all...")
 			self.add_tab_to_notebook(None, params)
 			return
 		successful = result[0]
 		data = result[1]
-		
+
 		self.add_tab_to_notebook(data, params)
 
 	def add_tab_to_notebook(self, data, params):
-		#print data
-		#print "add_tab_to_notebook !!!!"
+		#print(data)
+		#print("add_tab_to_notebook !!!!")
 		if not self.settings.get_boolean('preventautoweblookup'):
 			doAutoLookup = True
 		else:
@@ -422,7 +424,7 @@ class TabSearch(GObject.Object):
 				self.update_info_tab('\t-> Nothing found!\n' + data)
 				self.load_tabs('web')
 			else:
-				data = "you should not see this, check source code!"			
+				data = "you should not see this, check source code!"
 				self.update_info_tab('\t-> Nothing found!\n' + data)
 		else:
 			if params['source'] == 'hdd':
@@ -441,7 +443,7 @@ class TabSearch(GObject.Object):
 
 	def update_info_tab(self, new_content):
 		self.info_tab.add_content(new_content)
-		
+
 		if len(self.notebook.get_children()) == 0:
 			# create info tab for the first time
 			scroll = self.create_page(self.info_tab.content)
@@ -461,11 +463,11 @@ class TabSearch(GObject.Object):
 	def update_notebook(self, source, artist, title):
 		""" Update notebook """
 		if len(self.tab_list) == 0:
-			print 'no tabs in tab_list !'
+			print('no tabs in tab_list !')
 		else:
 			# data tabs
 			for tab in self.tab_list:
-				if not(tab.label == "Not Found"): 
+				if not(tab.label == "Not Found"):
 					scroll = self.create_page(tab.content)
 					self.notebook.append_page(scroll, Gtk.Label(tab.label))
 		self.tab_list = []
@@ -483,6 +485,6 @@ class TabSearch(GObject.Object):
 		scroll = Gtk.ScrolledWindow()
 		scroll.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
 		scroll.set_shadow_type(Gtk.ShadowType.IN)
-		scroll.add(textview) 
+		scroll.add(textview)
 		scroll.show()
 		return scroll

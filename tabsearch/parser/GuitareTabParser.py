@@ -23,7 +23,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA.
 
 from Tab import Tab
-from GenericTabsiteParser import GenericTabsiteParser
+from parser.GenericTabsiteParser import GenericTabsiteParser
 
 class GuitareTabParser (GenericTabsiteParser):
 	def __init__(self, callback_content, callback_info):
@@ -45,7 +45,7 @@ class GuitareTabParser (GenericTabsiteParser):
 	def generate_url_to_overview(self):
 		artist = self.prepare_artist_for_url()
 		first_letter = artist[0]
-		
+
 		return "http://www.guitaretab.com/"+first_letter+"/"+artist+"/all.htm"
 
 	def get_title_expr(self):
@@ -71,5 +71,5 @@ class GuitareTabParser (GenericTabsiteParser):
 			#TODO: grabbing real type and title
 			type = ''
 			title = ''
-			self.fetch_single_tab(link, type, title) 
+			self.fetch_single_tab(link, type, title)
 

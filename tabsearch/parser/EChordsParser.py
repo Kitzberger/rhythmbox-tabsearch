@@ -24,9 +24,9 @@
 
 from Tab import Tab
 from lxml.html import fromstring
-from GenericTabsiteParser import GenericTabsiteParser
+from parser.GenericTabsiteParser import GenericTabsiteParser
 from Helper import remove_accents
-from gi._glib import GError
+from gi.repository.GLib import GError
 from gi.repository import Gio
 
 class EChordsParser (GenericTabsiteParser):
@@ -66,12 +66,12 @@ class EChordsParser (GenericTabsiteParser):
 
 	def fetch_single_tab(self, url, type, title):
 		""" Fetches page from given url and fetches tabs """
-		print "-> " + url
-		
+		print("-> " + url)
+
 		tab = "nothing"
 		if url != "":
 			url = "http://www.e-chords.com/"+url
 			self.file_res = Gio.File.new_for_uri(url)
 			self.file_res.load_contents_async(None, self.process_single_page, {'url': url, 'type': type, 'title': title})
 
-	
+

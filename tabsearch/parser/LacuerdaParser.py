@@ -23,7 +23,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA.
 
 from Tab import Tab
-from GenericTabsiteParser import GenericTabsiteParser
+from parser.GenericTabsiteParser import GenericTabsiteParser
 from Helper import remove_accents
 
 class LacuerdaParser (GenericTabsiteParser):
@@ -48,14 +48,13 @@ class LacuerdaParser (GenericTabsiteParser):
 		artist = self.prepare_artist_for_url()
 		title = self.prepare_title_for_url()
 		first_letter = artist[0]
-		
+
 		#http://lacuerda.net/tabs/n/nacho_vegas/al_final_te_estare_esperando
 		return "http://lacuerda.net/tabs/" + first_letter + "/" + artist + "/" + title
 
 	def get_title_expr(self):
-		print 'title: ' + self.title
+		print('title: ' + self.title)
 		title = self.cleanTitle()
-		title = title.decode('utf-8')
 		title = title.replace(', ', ' ')	# hail, hail from pearl jam
 		title = title.replace(',', ' ')
 		title = title.replace('\'', '')		# let's ride from airbourne
@@ -70,7 +69,7 @@ class LacuerdaParser (GenericTabsiteParser):
 		for td in tree:
 			js = td.getparent().get('onclick')
 			tmp = js[2:3]
-			print 'title: ' + title + ', tmp: ' + tmp
+			print('title: ' + title + ', tmp: ' + tmp)
 			if tmp == "1":
 				tmp = title
 			else:
@@ -79,4 +78,4 @@ class LacuerdaParser (GenericTabsiteParser):
 			# TODO: grapping the real type
 			tab_type = ''
 			link = "http://lacuerda.net/tabs/" + first_letter + "/" + artist + "/" + tmp + ".shtml"
-			self.fetch_single_tab(link, tab_type, tab_title) 
+			self.fetch_single_tab(link, tab_type, tab_title)
