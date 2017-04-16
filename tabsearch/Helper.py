@@ -17,10 +17,10 @@ def remove_accents(str, strict = False):
 	if strict:
 		str = str.replace('é', 'e')
 		str = str.replace('è', 'e')
-	#print type(str)
-	nkfd_form = unicodedata.normalize('NFKD', str.decode('utf-8'))
-	only_ascii = nkfd_form.encode('ASCII', 'ignore')
-	#print str
+	#print(type(str))
+	#nkfd_form = unicodedata.normalize('NFKD', str.decode('utf-8'))
+	#only_ascii = nkfd_form.encode('ASCII', 'ignore')
+	#print(str)
 	return str
 
 def remove_html_tags(data):

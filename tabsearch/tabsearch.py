@@ -101,14 +101,9 @@ class TabSearch(GObject.Object):
 
 		# since the visibility toggle is per default set to TRUE,
 		# click it once, if visibility in gconf is set to false!
-		if self.settings.get_boolean('visible') == False:
-			action = self.action_group.get_action('ToggleTabSearch')
-			action.activate();
-
-		uim = self.sp.get_property('ui-manager')
-		uim.insert_action_group (self.action_group, 0)
-		self.ui_id = uim.add_ui_from_string(tab_search_ui)
-		uim.ensure_update()
+		#if self.settings.get_boolean('visible') == False:
+			#action = self.action_group.get_action('ToggleTabSearch')
+			#action.activate();
 
 
 	def init_gui(self) :
@@ -303,9 +298,6 @@ class TabSearch(GObject.Object):
 		self.db = None
 		self.plugin = None
 		shell.remove_widget(self.vbox, RB.ShellUILocation.RIGHT_SIDEBAR)
-		uim = self.sp.get_property('ui-manager')		
-		uim.remove_ui(self.ui_id)
-		uim.remove_action_group(self.action_group)
 
 	# toggles the visibility of the tab widget
 	def toggle_visibility(self, action):
