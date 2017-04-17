@@ -382,10 +382,10 @@ class TabSearch(GObject.Object):
 	def add_tab_to_notebook(self, data, params):
 		#print(data)
 		#print("add_tab_to_notebook !!!!")
-		if not self.settings.get_boolean('preventautoweblookup'):
+		try:
+			doAutoLookup = self.settings.get_boolean('preventautoweblookup')
+		except:
 			doAutoLookup = True
-		else:
-			doAutoLookup = False
 
 		# local file not found
 		if data is None:
@@ -406,7 +406,7 @@ class TabSearch(GObject.Object):
 				if doAutoLookup:
 					self.load_tabs('web')
 				else:
-					self.update_info_tab('\t-> You choose not to lookup when local tab is found...');
+					self.update_info_tab('\t-> You choose not to lookup the web for tabs\n\t   in case locally stored tabs cannot be found.\n\t   So no web lookup for you.\n\t   You can re-enable it in the plugin configs though.\n\t   Or simple hit the button above ;-)');
 			else:
 				# inform user on info tab about success at fetching data
 				self.update_info_tab('\t-> tabs found on ' + params['source'] + ' for \'' + params['artist'] + '\' - \'' + params['title'] + '\'.')
