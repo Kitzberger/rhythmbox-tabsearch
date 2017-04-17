@@ -5,11 +5,11 @@ A plugin for [Rhythmbox](https://wiki.gnome.org/Apps/Rhythmbox) to load tabs for
 ## Features
 
 * Supports these tab sites:
-** [AZChords](https://www.azchords.com/)
-** [e-chords](http://www.e-chords.com/)
-** [GuitareTab](http://www.guitaretab.com/)
-** [ultimateGuitar](https://www.ultimate-guitar.com/)
-** [lacuerda](http://lacuerda.net/)
+  * [AZChords](https://www.azchords.com/)
+  * [e-chords](http://www.e-chords.com/)
+  * [GuitareTab](http://www.guitaretab.com/)
+  * [ultimateGuitar](https://www.ultimate-guitar.com/)
+  * [lacuerda](http://lacuerda.net/)
 * Stores tabs locally, allows editing too
 
 ## Requirements / compatibility
