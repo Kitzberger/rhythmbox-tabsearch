@@ -44,17 +44,6 @@ from Helper import remove_accents
 STOCK_IMAGE = "tab-rhythmbox"
 ICON_FILENAME = "tab-rhythmbox.svg"
 
-tab_search_ui = """
-<ui>
-	<toolbar name="ToolBar">
-		<placeholder name="ToolBarPluginPlaceholder">
-			<toolitem name="TabSearch-1" action="ToggleTabSearch" />
-		</placeholder>
-	</toolbar>
-</ui>
-"""
-
-
 from TabConfigureDialog import TabConfigureDialog
 
 # this class represents the tab search plugin
@@ -269,25 +258,19 @@ class TabSearch(GObject.Object):
 
 				self.sites = self.get_sites()
 				for s in self.sites:
-					site_id = s
 					if s == 'gt':
-						#gt = GuitareTabParser(self.add_tab_to_notebook, self.update_info_tab)
 						gt = GuitareTabParser(self.add_tab_to_notebook, self.notify_finish)
 						gt.tabs_finder(playing_artist, playing_title)
 					elif s == 'ug':
-						#ug = UltimateGuitarParser(self.add_tab_to_notebook, self.update_info_tab)
 						ug = UltimateGuitarParser(self.add_tab_to_notebook, self.notify_finish)
 						ug.tabs_finder(playing_artist, playing_title)
 					elif s == 'az':
-						#az = AZChordsParser(self.add_tab_to_notebook, self.update_info_tab)
 						az = AZChordsParser(self.add_tab_to_notebook, self.notify_finish)
 						az.tabs_finder(playing_artist, playing_title)
 					elif s == 'ec':
-						#ec = EChordsParser(self.add_tab_to_notebook, self.update_info_tab)
 						ec = EChordsParser(self.add_tab_to_notebook, self.notify_finish)
 						ec.tabs_finder(playing_artist, playing_title)
 					elif s == 'lc':
-						#lc = LacuerdaParser(self.add_tab_to_notebook, self.update_info_tab)
 						lc = LacuerdaParser(self.add_tab_to_notebook, self.notify_finish)
 						lc.tabs_finder(playing_artist, playing_title)
 

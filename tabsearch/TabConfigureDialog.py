@@ -36,14 +36,13 @@ class TabConfigureDialog(GObject.Object, PeasGtk.Configurable):
 
 	def do_create_configure_widget(self):
 		builder = Gtk.Builder()
-		print(rb.find_plugin_file(self, "tab-prefs.ui"))
-		builder.add_from_file(rb.find_plugin_file(self, "tab-prefs.ui"))
+		prefs_file = rb.find_plugin_file(self, "tab-prefs.ui")
+		print('Using this file to create the configuration widget: ' + prefs_file)
+		builder.add_from_file(prefs_file)
 
 		self.dialog = builder.get_object("preferences_dialog")
 
 		self.path_display = builder.get_object("path_display")
-
-		self.dialog.connect("response", self.dialog_response)
 
 		preferences = self.get_prefs()
 
@@ -53,33 +52,26 @@ class TabConfigureDialog(GObject.Object, PeasGtk.Configurable):
 			site_id = s['id']
 			checkbutton = Gtk.CheckButton(label = s['name'])
 			checkbutton.set_active(s['id'] in preferences['sites'])
+			checkbutton.connect("toggled", self.set_sites)
 			self.site_checks[site_id] = checkbutton
 			site_box.pack_start(checkbutton, expand=False, fill=True, padding=0)
 
 		self.filechooser = builder.get_object('filechooser')
 		self.filechooser.set_current_folder(preferences['folder'])
+		self.filechooser.connect('file-set', self.set_folder)
 
 		self.preventAutoWebLookup_checkbutton = builder.get_object('preventAutoWebLookup_checkbutton')
 		self.preventAutoWebLookup_checkbutton.set_active(preferences['preventAutoWebLookup'])
+		self.preventAutoWebLookup_checkbutton.connect("state_set", self.set_preventAutoWebLookup)
 
 		self.default_folder_button = builder.get_object('default_folder_button')
 		self.default_folder_button.connect('clicked', self.set_folderchooser_to_default)
 
 		site_box.show_all()
 
-	def set_folderchooser_to_default(self, param1):
-		self.filechooser.set_current_folder(path.expanduser('~') + '/.cache/rhythmbox/tabs/')
+		return self.dialog
 
-
-	def dialog_response(self, dialog, response):
-		if response == Gtk.ResponseType.OK:
-			self.set_values()
-			self.dialog.hide()
-		elif response == Gtk.ResponseType.CANCEL or response == Gtk.ResponseType.DELETE_EVENT:
-			self.dialog.hide()
-
-
-	def set_values(self):
+	def set_sites(self, param1):
 		# loading the preferences from dialog
 		sites = []
 		for s in tab_sites:
@@ -88,24 +80,21 @@ class TabConfigureDialog(GObject.Object, PeasGtk.Configurable):
 				continue
 			if check.get_active():
 				sites.append(s['id'])
-		folder = self.filechooser.get_current_folder()
-		preventAutoWebLookup = self.preventAutoWebLookup_checkbutton.get_active()
-
-		# storing the preferences into Gio.Settings
-#		self.gconf.set_list(self.gconf_keys['sites'], gconf.VALUE_STRING, sites)
-#		self.gconf.set_string(self.gconf_keys['folder'], folder)
-#		self.gconf.set_bool(self.gconf_keys['preventAutoWebLookup'], preventAutoWebLookup)
 		self.settings['sites'] = sites
+
+	def set_folder(self, param1):
+		folder = self.filechooser.get_current_folder()
 		self.settings.set_string('folder', folder)
+
+	def set_folderchooser_to_default(self, param1):
+		self.filechooser.set_current_folder(path.expanduser('~') + '/.cache/rhythmbox/tabs/')
+
+	def set_preventAutoWebLookup(self, param1, param2):
+		preventAutoWebLookup = self.preventAutoWebLookup_checkbutton.get_active()
 		self.settings.set_boolean('preventautoweblookup', preventAutoWebLookup)
-
-
-	def get_dialog(self):
-		return self.dialog
 
 	def get_prefs(self):
 		try:
-#			sites = gconf.client_get_default().get_list(self.gconf_keys['sites'], gconf.VALUE_STRING)
 			sites = self.settings['sites']
 			if sites is None:
 				sites = []
@@ -113,7 +102,6 @@ class TabConfigureDialog(GObject.Object, PeasGtk.Configurable):
 			print(e)
 			sites = []
 		try:
-#			folder = gconf.client_get_default().get_string(self.gconf_keys['folder'])
 			folder = self.settings.get_string('folder')
 			if folder is None:
 				folder = path.expanduser('~') + '/.cache/rhythmbox/tabs/'
@@ -121,10 +109,13 @@ class TabConfigureDialog(GObject.Object, PeasGtk.Configurable):
 			print(e)
 			folder = path.expanduser('~') + '/.cache/rhythmbox/tabs/'
 		try:
-#			preventAutoWebLookup = gconf.client_get_default().get_bool(self.gconf_keys['preventAutoWebLookup'])
 			preventAutoWebLookup = self.settings.get_boolean('preventautoweblookup')
 		except GObject.GError as e:
 			print(e)
 			preventAutoWebLookup = False
-		return {'sites': (sites), 'folder': folder, 'preventAutoWebLookup': preventAutoWebLookup}
 
+		print("tab sites: " + str(sites))
+		print("tab folder: " + folder)
+		print("preventAutoWebLookup: " + str(preventAutoWebLookup))
+
+		return {'sites': (sites), 'folder': folder, 'preventAutoWebLookup': preventAutoWebLookup}
