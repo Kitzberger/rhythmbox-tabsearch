@@ -5,7 +5,7 @@ A plugin for [Rhythmbox](https://wiki.gnome.org/Apps/Rhythmbox) to load tabs for
 ## Features
 
 * Supports these tab sites:
-  * [AZChords](https://www.azchords.com/)
+  * [AZChords](https://www.azchords.com/) (currently broken)
   * [e-chords](http://www.e-chords.com/)
   * [GuitareTab](http://www.guitaretab.com/)
   * [ultimateGuitar](https://www.ultimate-guitar.com/)
@@ -16,6 +16,7 @@ A plugin for [Rhythmbox](https://wiki.gnome.org/Apps/Rhythmbox) to load tabs for
 
 * rhythmbox 3.3
 * python 3.x
+* python-lxml
 
 ## Installation
 
